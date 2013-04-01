@@ -1,0 +1,59 @@
+{% extends "_layout.html" %}
+{% block title %}New registeration{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="span7 well">
+
+            <div id="d_create_project">
+                <form id="form_">
+                    <fieldset>
+                        <legend> Login Now</legend>
+                        <label for="email">Login email</label>
+                        <input type="text" placeholder="Your email." id="email" name="email"/>
+                        <span class="help-block"></span>
+                        <label for="password">Password</label>
+                        <input type="password" placeholder="Your password, at least 6 char." id="password"
+                               name="password"/>
+                        <span class="help-block"></span>
+                        <button type="button" class="btn" id="btn_save_reg">Login</button>
+                        <div id="pg_error" class="error"></div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <div class="span4 well">
+            <h4>I have not any acccount.</h4>
+            <a class="btn btn-large btn-success" href="/account/reg/"><i class="icon-user icon-white"></i> Register Now</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block foot_js %}
+    <script src="/js/jquery.validate/jquery.validate.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            var v = $("#form_").validate({
+                rules: {
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    password: {"required": true, minlength: 6},
+                    nick: 'required'
+                }
+            });
+            $("#btn_save_reg").click(function () {
+                if (!$("#form_").valid()) return;
+                $.post("/account/login/",
+                        {email: $("#email").val(), password: $("#password").val()},
+                        function (res) {
+                            if (res.state) {
+                                window.location = "/";
+                                return;
+                            }
+                            $("#pg_error").html(res.message);
+                        }, 'json');
+            })
+        })
+    </script>
+{% endblock %}
