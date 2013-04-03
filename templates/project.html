@@ -1,18 +1,18 @@
 {% extends "_layout.html" %}
 {% block title %}Create project{% endblock %}
 {% block content %}
-    <div class="row">
-        <div class="span6" style="min-height: 600px">
-            <fieldset>
-                <legend style="position: relative">
-                    <i class="icon-book"></i>
-                    <a href="javascript:;" id="l_project">
-                        {% if project and project.title != None %}
-                            {{ project.title }}
-                        {% else %}
-                            Project
-                        {% endif %}
-                    </a>
+<div class="row">
+    <div class="span6" style="min-height: 600px">
+        <fieldset>
+            <legend style="position: relative">
+                <i class="icon-book"></i>
+                <a href="javascript:;" id="l_project">
+                    {% if project and project.title != None %}
+                    {{ project.title }}
+                    {% else %}
+                    Project
+                    {% endif %}
+                </a>
                     <span class="btn-group" style="position: absolute;top: 5px;right: 10px;">
                         <button class="btn btn-small btn-success save_project"><i class="icon-hdd icon-white"></i>
                         </button>
@@ -23,21 +23,21 @@
                         <button class="btn btn-small btn-success" id='edit_project'><i class="icon-edit icon-white"></i>
                         </button>
                     </span>
-                </legend>
+            </legend>
 
-                <div class="accordion" id="accordion_project">
-                    {% if project.tables %}
-                        {% for xtable in project.tables %}
-                            <div class="accordion-group" data-flag="{{ xtable.name }}">
-                                <div class="accordion-heading" style="position: relative">
-                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_project"
-                                       href="#tb_{{ xtable.name }}">
-                                        <i class="icon-calendar"></i> <span
-                                            class="l_t_name">{{ xtable.title }} [{{ xtable.name }}]</span>
-                                    </a>
+            <div class="accordion" id="accordion_project">
+                {% if project.tables %}
+                {% for xtable in project.tables %}
+                <div class="accordion-group" data-flag="{{ xtable.name }}">
+                    <div class="accordion-heading" style="position: relative">
+                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion_project"
+                           href="#tb_{{ xtable.name }}">
+                            <i class="icon-calendar"></i> <span
+                                class="l_t_name">{{ xtable.title }} [{{ xtable.name }}]</span>
+                        </a>
                                     <span class="btn-group table-button"
                                           style="position: absolute;top: 5px;right: 10px">
-                                        <button class="btn btn-small btn-danger del_col"><i
+                                        <button class="btn btn-small btn-danger del_table"><i
                                                 class="icon-remove icon-white"></i></button>
                                         <button class="btn btn-small btn-success add_col"><i
                                                 class="icon-plus icon-white"></i></button>
@@ -45,13 +45,13 @@
                                                 class="icon-edit icon-white"></i>
                                         </button>
                                     </span>
-                                </div>
-                                <div id="tb_{{ xtable.name }}" class="accordion-body collapse">
-                                    <div class="accordion-inner">
-                                        {% if xtable.cols %}
-                                            {% for xcol in xtable.cols %}
-                                                <div class="xcol" data-flag='{{ xcol.name }}'>
-                                                    <i class="icon-leaf"></i> {{ xcol.title }} [{{ xcol.name }}]
+                    </div>
+                    <div id="tb_{{ xtable.name }}" class="accordion-body collapse">
+                        <div class="accordion-inner">
+                            {% if xtable.cols %}
+                            {% for xcol in xtable.cols %}
+                            <div class="xcol" data-flag='{{ xcol.name }}'>
+                                <i class="icon-leaf"></i> {{ xcol.title }} [{{ xcol.name }}]
                                                     <span class="btn-group table-button pull-right">
                                                         <button class="btn btn-small btn-danger del_col"><i
                                                                 class="icon-remove icon-white"></i></button>
@@ -59,132 +59,139 @@
                                                             <i class="icon-edit icon-white"></i>
                                                         </button>
                                                     </span>
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </div>
-                                </div>
                             </div>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </fieldset>
-
-        </div>
-        <div class="span6">
-            <div id="d_create_project" style="display: none" class="edit_div">
-                <form id="form_project">
-                    <fieldset>
-                        <legend> Create project</legend>
-                        <label for="p_title">Project title</label>
-                        <input type="text" placeholder="A friendly name for your project." id="p_title" name="p_title"/>
-                        <span class="help-block"></span>
-                        <label for="p_title">Target db</label>
-                        <select id="p_db">
-                            {% for db in types_map %}
-                                <option value="{{ db }}">{{ db }}</option>
                             {% endfor %}
-                        </select>
-                        <span class="help-block"></span>
-                        <label for="p_content">Project description</label>
-                        <textarea placeholder="Decribe it" id="p_content" name="p_content" cols="400"
-                                  rows="8"></textarea>
-                        <span class="help-block"></span>
-                        <button type="button" class="btn" id="btn_save_project">Save</button>
-                        <div id="pg_error_project" class="error"></div>
-                    </fieldset>
-                </form>
-            </div>
-
-            <div id="d_create_table" style="display: none" class="edit_div">
-                <form id="form_table">
-                    <fieldset>
-                        <legend> Create/Edit table</legend>
-                        <label for="t_name">Table name</label>
-                        <input type="text" placeholder="" id="t_name" name="t_name"/>
-                        <span class="help-block"></span>
-                        <label for="t_title">Table title</label>
-                        <input type="text" placeholder="" id="t_title" name="t_title"/>
-                        <span class="help-block"></span>
-                        <label for="t_content">Table description</label>
-                        <textarea placeholder="Decribe it" id="t_content" name="t_content" cols="400"
-                                  rows="8"></textarea>
-                        <span class="help-block"></span>
-                        <button type="button" class="btn" id="btn_save_table">Save</button>
-                        <div id="pg_error_table" class="error"></div>
-                    </fieldset>
-                </form>
-            </div>
-
-            <div id="d_create_col" style="display: none" class="edit_div">
-                <form id="form_col">
-                    <fieldset>
-                        <legend> Create/Edit colume</legend>
-                        <label for="c_name">Colume name</label>
-                        <input type="text" placeholder="" id="c_name" name="c_name"/>
-                        <span class="help-block"></span>
-                        <label for="c_title">Colume title</label>
-                        <input type="text" placeholder="" id="c_title" name="c_title"/>
-                        <span class="help-block"></span>
-                        <label for="c_type">Data type</label>
-                        <select id="c_type" name="c_type">
-                            {% if sql_types != None %}
-                                {% for tp in sql_types %}
-                                    <option value="{{ tp }}">{{ tp }}</option>
-                                {% endfor %}
                             {% endif %}
-                        </select>
-                        <span class="help-block"></span>
-                        <label>Properties</label>
-
-                        <div class="form-inline">
-                            <label class="checkbox"><input type="checkbox" value="1" id="is_pk" name="is_pk"/>PK</label>
-                            <label class="checkbox"><input type="checkbox" value="1" id="is_null" name="is_null"/>Allow
-                                null</label>
-                            <label class="checkbox"><input type="checkbox" value="1" id="is_unique" name="is_unique"/>Unique
-                            </label>
-                            <label class="checkbox"><input type="checkbox" value="1" id="is_index" name="is_index"/>Index</label>
-                            <label class="checkbox"><input type="checkbox" value="1" id="auto_incres"
-                                                           name="auto_incres"/>Auto incres</label>
-
                         </div>
-                        <label for="c_init_val">Default value</label>
-                        <input type="text" placeholder="" id="c_init_val" name="c_init_val"/>
-
-                        <label>Foreign key</label>
-
-                        {#                        <div class="form-inline">#}
-                        {#                            <select id="fk_table" class="input-small"></select>#}
-                        {#                            <select id="fk_table_col" class="input-small"></select>#}
-                        {#                            <select id="fk_table_col_show" class="input-small"></select>#}
-                        {#                        </div>#}
-                        <label for="c_content">Colume description</label>
-                        <textarea id="c_content" name="c_content" cols="400"
-                                  rows="4"></textarea>
-                        <span class="help-block"></span>
-                        <button type="button" class="btn" id="btn_save_col">Save</button>
-                        <div id="pg_error_col" class="error"></div>
-                    </fieldset>
-                </form>
-
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
             </div>
+        </fieldset>
+
+    </div>
+    <div class="span6">
+        <div id="d_create_project" style="display: none" class="edit_div">
+            <form id="form_project">
+                <fieldset>
+                    <legend> Create project</legend>
+                    <label for="p_title">Project title</label>
+                    <input type="text" placeholder="A friendly name for your project." id="p_title" name="p_title"/>
+                    <span class="help-block"></span>
+                    <label for="p_title">Target db</label>
+                    <select id="p_db">
+                        {% for db in types_map %}
+                        <option value="{{ db }}">{{ db }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="help-block"></span>
+                    <label for="p_content">Project description</label>
+                    <textarea placeholder="Decribe it" id="p_content" name="p_content" cols="400"
+                              rows="8"></textarea>
+                    <span class="help-block"></span>
+                    <button type="button" class="btn" id="btn_save_project">Save</button>
+                    <div id="pg_error_project" class="error"></div>
+                </fieldset>
+            </form>
+        </div>
+
+        <div id="d_create_table" style="display: none" class="edit_div">
+            <form id="form_table">
+                <fieldset>
+                    <legend> Create/Edit table</legend>
+                    <label for="t_name">Table name</label>
+                    <input type="text" placeholder="" id="t_name" name="t_name"/>
+                    <span class="help-block"></span>
+                    <label for="t_title">Table title</label>
+                    <input type="text" placeholder="" id="t_title" name="t_title"/>
+                    <span class="help-block"></span>
+                    <label for="t_content">Table description</label>
+                    <textarea placeholder="Decribe it" id="t_content" name="t_content" cols="400"
+                              rows="8"></textarea>
+                    <span class="help-block"></span>
+                    <button type="button" class="btn" id="btn_save_table">Save</button>
+                    <div id="pg_error_table" class="error"></div>
+                </fieldset>
+            </form>
+        </div>
+
+        <div id="d_create_col" style="display: none" class="edit_div">
+            <form id="form_col">
+                <fieldset>
+                    <legend> Create/Edit colume</legend>
+                    <label for="c_name">Colume name</label>
+                    <input type="text" placeholder="" id="c_name" name="c_name"/>
+                    <span class="help-block"></span>
+                    <label for="c_title">Colume title</label>
+                    <input type="text" placeholder="" id="c_title" name="c_title"/>
+                    <span class="help-block"></span>
+                    <label for="c_type">Data type</label>
+                    <select id="c_type" name="c_type">
+                        {% if sql_types != None %}
+                        {% for tp in sql_types %}
+                        <option value="{{ tp }}">{{ tp }}</option>
+                        {% endfor %}
+                        {% endif %}
+                    </select>
+                    <span class="help-block"></span>
+                    <label>Properties</label>
+
+                    <div class="form-inline">
+                        <label class="checkbox"><input type="checkbox" value="1" id="is_pk" name="is_pk"/>PK</label>
+                        <label class="checkbox"><input type="checkbox" value="1" id="is_null" name="is_null"/>Allow
+                            null</label>
+                        <label class="checkbox"><input type="checkbox" value="1" id="is_unique" name="is_unique"/>Unique
+                        </label>
+                        <label class="checkbox"><input type="checkbox" value="1" id="is_index"
+                                                       name="is_index"/>Index</label>
+                        <label class="checkbox"><input type="checkbox" value="1" id="auto_incres"
+                                                       name="auto_incres"/>Auto incres</label>
+                    </div>
+                    <label for="c_length">Length</label>
+                    <input type="text" placeholder="" id="c_length" name="c_length"/>
+                    <span class="help-block"></span>
+
+                    <label for="c_init_val">Default value</label>
+                    <input type="text" placeholder="" id="c_init_val" name="c_init_val"/>
+
+                    <label>Foreign key</label>
+
+                    {#
+                    <div class="form-inline">#}
+                        {# <select id="fk_table" class="input-small"></select>#}
+                        {# <select id="fk_table_col" class="input-small"></select>#}
+                        {# <select id="fk_table_col_show" class="input-small"></select>#}
+                        {#
+                    </div>
+                    #}
+                    <label for="c_content">Colume description</label>
+                    <textarea id="c_content" name="c_content" cols="400"
+                              rows="4"></textarea>
+                    <span class="help-block"></span>
+                    <button type="button" class="btn" id="btn_save_col">Save</button>
+                    <div id="pg_error_col" class="error"></div>
+                </fieldset>
+            </form>
+
         </div>
     </div>
+</div>
 {% endblock %}
 
 {% block foot_js %}
-    <script src="/js/jquery.validate/jquery.validate.js" type="text/javascript"></script>
-    <script src="/js/project.js" type="text/javascript"></script>
+<script src="/js/jquery.validate/jquery.validate.js" type="text/javascript"></script>
+<script src="/js/project.js" type="text/javascript"></script>
 
-    <style type="text/css">
-        .xcol {
-            width: 145px;
-            height: 60px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 4px;
-            float: left;
-        }
-    </style>
+<style type="text/css">
+    .xcol {
+        width: 145px;
+        height: 60px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 4px;
+        float: left;
+    }
+</style>
 {% endblock %}

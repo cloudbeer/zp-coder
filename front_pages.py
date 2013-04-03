@@ -1,7 +1,9 @@
 #coding: utf-8
+import datetime
+import urllib
 from flask import render_template, request, session, make_response, redirect
 from models.project import table, col
-from models.orm import User
+from models.orm import User, Project, Template
 from zp_tools import rdm_code, hash_pwd, json_res, is_name, str2bool
 from zp_web import app, get_db
 from zp_tools import s_user, s_project
@@ -22,21 +24,26 @@ def pg_projects():
 
 @app.route("/project/")
 def pg_project():
-    project = s_project()
-    sql_types = None
-    db = project.db
-    if db in types_map:
-        sql_types = types_map[db]['sql']
-    return render_template("project.html", project=project, user=s_user(), types_map=types_map, sql_types=sql_types)
-
+    user = s_user()
+    if user:
+        project = s_project()
+        sql_types = None
+        db = project.db
+        if db in types_map:
+            sql_types = types_map[db]['sql']
+        return render_template("project.html", project=project, user=s_user(), types_map=types_map, sql_types=sql_types)
+    else:
+        return redirect('/account/login/?' + urllib.urlencode({'back': request.path}))
 
 
 @app.route("/project/<int:id>/")
-def pg_project(id):
+def pg_my_project(id):
     return "i love ..." + str(id)
     import yaml
+
     content = ""
     project = yaml.load(content)
+    session['project'] = project
     db = project.db
     sql_types = None
     if db in types_map:
@@ -60,9 +67,16 @@ def pg_project_save():
 @app.route("/project/save2db/", methods=['post', 'get'])
 def pg_project_save_to_db():
     project = s_project()
+    user = s_user()
     import yaml
-    conten = yaml.dump(project)
-    return conten
+    content = yaml.dump(project)
+    m_project = Project(title=project.title, content=content, user_id=user)
+    db = get_db()
+    db.add(m_project)
+    db.commit()
+    project.dbid = m_project.id
+    session['project'] = project
+    return json_res(True).str()
 
 
 @app.route("/project/get_project/", methods=['post', 'get'])
@@ -216,7 +230,10 @@ def check_email(email):
 
 @app.route("/account/login/")
 def pg_login():
-    return render_template("login.html")
+    back = request.args.get('back','')
+    if not back:
+        back = '/'
+    return render_template("login.html", back=back)
 
 
 @app.route("/account/logout/")

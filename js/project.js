@@ -100,6 +100,8 @@ $(function () {
                                             <i class="icon-calendar"></i> <span class="l_t_name">' + xtitle + ' [' + xname + ']</span> \
                                             </a> \
                                             <span class="btn-group table-button" style="position: absolute;top: 5px;right: 10px"> \
+                                            <button class="btn btn-small btn-danger del_table"><i \
+                                                class="icon-remove icon-white"></i></button> \
                                             <button class="btn btn-small btn-success add_col"><i class="icon-plus icon-white"></i></button> \
                                     <button class="btn btn-small btn-success edit_table"><i class="icon-edit icon-white"></i> \
                                             </button> \
@@ -121,7 +123,7 @@ $(function () {
             }, 'json');
     });
 
-    $(".edit_table").on('click', function () {
+    $(document).on('click', 'edit_table',function () {
         var flag = $(this).parent().parent().parent().attr("data-flag");
         $.post("/project/get_table/", {flag: flag}, function (res) {
             if (res.state) {
@@ -137,7 +139,8 @@ $(function () {
         }, 'json');
     });
 
-    $(".add_col").on('click', function () {
+
+    $(document).on('click', '.add_col', function () {
         $(".edit_div").hide();
         reset_form();
         act = "create";

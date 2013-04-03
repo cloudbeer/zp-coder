@@ -48,7 +48,7 @@
                         {email: $("#email").val(), password: $("#password").val()},
                         function (res) {
                             if (res.state) {
-                                window.location = "/";
+                                window.location = "{{back}}";
                                 return;
                             }
                             $("#pg_error").html(res.message);
