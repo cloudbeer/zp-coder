@@ -12,12 +12,23 @@ from zp_types import types_map
 __author__ = 'cloudbeer'
 
 
+def session_user(func):
+    def warpper():
+        user = s_user()
+        if not user:
+            return redirect('/account/login/?' + urllib.urlencode({'back': request.path}))
+        else:
+            return func()
+    return warpper
+
+
 @app.route("/")
 def pg_index():
     return render_template("index.html", user=s_user())
 
 
 @app.route("/projects/")
+@session_user
 def pg_projects():
     return render_template("projects.html", projects=None, user=s_user())
 
