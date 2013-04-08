@@ -1,5 +1,6 @@
 #coding: utf-8
 import datetime
+from functools import wraps
 import urllib
 from flask import render_template, request, session, make_response, redirect
 from models.project import table, col
@@ -12,15 +13,26 @@ from zp_types import types_map
 __author__ = 'cloudbeer'
 
 
-def session_user(func):
-    def warpper():
+def login_required(func):
+    @wraps(func)
+    def warpper_mormal(*args, **kwargs):
         user = s_user()
         if not user:
             return redirect('/account/login/?' + urllib.urlencode({'back': request.path}))
         else:
-            return func()
-    return warpper
+            return func(*args, **kwargs)
+    return warpper_mormal
 
+
+def login_required_ajax(func):
+    @wraps(func)
+    def warpper_ajax(*args, **kwargs):
+        user = s_user()
+        if not user:
+            return json_res(False, message='You must login first.').str()
+        else:
+            return func(*args, **kwargs)
+    return warpper_ajax
 
 @app.route("/")
 def pg_index():
@@ -28,12 +40,16 @@ def pg_index():
 
 
 @app.route("/projects/")
-@session_user
+@login_required
 def pg_projects():
-    return render_template("projects.html", projects=None, user=s_user())
+    user = s_user()
+    db = get_db()
+    projects = db.query(Project).filter(User.id == user.id)
+    return render_template("projects.html", projects=projects, user=s_user())
 
 
 @app.route("/project/")
+@login_required
 def pg_project():
     user = s_user()
     if user:
@@ -48,11 +64,14 @@ def pg_project():
 
 
 @app.route("/project/<int:id>/")
+@login_required
 def pg_my_project(id):
-    return "i love ..." + str(id)
+    db = get_db()
+    project = db.query(Project).filter(Project.id == id)
+    if project is None:
+        return "Error Project."
     import yaml
-
-    content = ""
+    content = project.content
     project = yaml.load(content)
     session['project'] = project
     db = project.db
@@ -63,6 +82,7 @@ def pg_my_project(id):
 
 
 @app.route("/project/save/", methods=['post'])
+@login_required_ajax
 def pg_project_save():
     title = request.form["title"]
     content = request.form["content"]
@@ -76,12 +96,14 @@ def pg_project_save():
 
 
 @app.route("/project/save2db/", methods=['post', 'get'])
+@login_required_ajax
 def pg_project_save_to_db():
     project = s_project()
     user = s_user()
     import yaml
     content = yaml.dump(project)
-    m_project = Project(title=project.title, content=content, user_id=user)
+    # return content
+    m_project = Project(title=project.title, content=content, user_id=user.id)
     db = get_db()
     db.add(m_project)
     db.commit()
@@ -91,6 +113,7 @@ def pg_project_save_to_db():
 
 
 @app.route("/project/get_project/", methods=['post', 'get'])
+@login_required_ajax
 def pg_project_get():
     project = s_project()
     res = json_res(True)
@@ -101,6 +124,7 @@ def pg_project_get():
 
 
 @app.route("/project/save_table/", methods=['post', 'get'])
+@login_required_ajax
 def pg_table_save():
     name = request.form["name"]
     if not is_name(name):
@@ -132,6 +156,7 @@ def pg_table_save():
 
 
 @app.route("/project/get_table/", methods=['post', 'get'])
+@login_required_ajax
 def pg_table_get():
     flag = request.form["flag"]
     project = s_project()
@@ -149,6 +174,7 @@ def pg_table_get():
 
 
 @app.route("/project/save_col/", methods=['post'])
+@login_required_ajax
 def pg_col_save():
     name = request.form["name"]
     if not is_name(name):
@@ -241,7 +267,7 @@ def check_email(email):
 
 @app.route("/account/login/")
 def pg_login():
-    back = request.args.get('back','')
+    back = request.args.get('back', '')
     if not back:
         back = '/'
     return render_template("login.html", back=back)

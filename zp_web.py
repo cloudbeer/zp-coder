@@ -2,7 +2,7 @@ from flask import Flask, session, request, Blueprint, _app_ctx_stack
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-DATABASE = 'postgres:zhwell@localhost:5432/zp_coder'
+DATABASE = 'postgresql+psycopg2://postgres:zhwell@localhost:5432/zp_coder'
 DEBUG = True
 SECRET_KEY = 'ihaveadream'
 USERNAME = 'admin'
@@ -19,7 +19,7 @@ def get_db():
     """
     top = _app_ctx_stack.top
     if not hasattr(top, 'zpcoder_db'):
-        engine = create_engine("postgresql+psycopg2://" + app.config["DATABASE"])
+        engine = create_engine(app.config["DATABASE"])
         Database = sessionmaker(bind=engine)
         top.zpcoder_db = Database()
     return top.zpcoder_db
@@ -44,6 +44,24 @@ static_bootstrap = Blueprint('static_bootstrap', __name__, static_folder='bootst
 app.register_blueprint(static_js)
 app.register_blueprint(static_css)
 app.register_blueprint(static_bootstrap)
+
+
+
+
+# from models.orm import *
+#
+#
+#
+# db = get_db()
+#
+# p = Project()
+# p.title = '''I'm have a "dream".'''
+# db.add(p)
+# db.commit()
+
+
+
+
 
 
 # sv_js = Blueprint('sv_js', __name__, static_folder='js')

@@ -1,5 +1,5 @@
 {% extends "_layout.html" %}
-{% block title %}Create project{% endblock %}
+{% block title %}My projects{% endblock %}
 {% block content %}
     <div class="row">
         <div class="span12 btn-group">
@@ -10,34 +10,36 @@
     <hr/>
     <div class="row">
         <div class="span12">
-            <table class="table table-bordered">
+            <table class="table">
+                <thead>
                 <tr>
-                    <td>Title</td>
+                    <td class="text-center">标题</td>
+                    <td class="text-center">创建时间</td>
+                    <td style="width: 90px" class="text-center">操作</td>
                 </tr>
+                </thead>
+                <tbody>
+                {% for project in projects %}
+                    <tr>
+                        <td>{{ project.title }}</td>
+                        <td>{{ project.create_date }}</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a href="/project/{{ project.id }}/" class="btn btn-small">修改</a>
+                                <a href="/share/" class="btn btn-small">我来分享</a>
+                                <a href="/produce/{{ project.id }}" class="btn btn-small">生产</a>
+                            </div>
+
+                        </td>
+                    </tr>
+                    </tbody>
+                {% endfor %}
             </table>
         </div>
     </div>
 {% endblock %}
 
 {% block foot_js %}
-    <script src="/js/jquery.validate/jquery.validate.js" type="text/javascript"></script>
     <script type="text/javascript">
-        $(function () {
-            var v = $("#form_project").validate({
-                rules: {
-                    title: "required"
-                }
-            });
-            $("#btn_save_project").click(function () {
-                if (!$("#form_project").valid()) return;
-                $.post("/project/save/", {title: $("#title").val(), describ: $("#describ").val()}, function (res) {
-                    if (res.state) {
-                        //add title left\
-                        return;
-                    }
-                    alert("error");
-                });
-            })
-        })
     </script>
 {% endblock %}
