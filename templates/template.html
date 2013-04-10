@@ -1,0 +1,37 @@
+{% extends "_layout.html" %}
+{% block title %}Create/Edit template{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        <div id="d_template" class="edit_div">
+            <form id="form_template" method="post">
+                <fieldset>
+                    <legend> Create/Edit template</legend>
+                    <label for="p_title">Template title</label>
+                    <input type="text" placeholder="A friendly name for your template." id="p_title" name="title" class="span11"/>
+                    <span class="help-block"></span>
+                    <label for="p_content">Conent</label>
+                    <textarea placeholder="" id="p_content" name="content" class="span11"
+                              rows="20"></textarea>
+                    <span class="help-block"></span>
+                    <button type="submit" class="btn" id="btn_save_project">Save</button>
+                    <div id="pg_error_template" class="error"></div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block foot_js %}
+<script src="/js/jquery.validate/jquery.validate.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(function(){
+    var v_form = $("#form_template").validate({
+        rules: {
+            p_title: "required"
+        }
+    });
+})
+</script>
+{% endblock %}

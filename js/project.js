@@ -189,9 +189,12 @@ $(function () {
     });
 
     $(".save_project").click(function () {
-        $.post("/project/save2db/", {}, function () {
-            alert(0);
-        });
+        $.post("/project/save2db/", {}, function (res) {
+            if (!res.state) {
+                alert(res.message);
+            }
+            window.location="/projects/"
+        }, 'json');
     });
 
 //    $("#c_db").change(function () {

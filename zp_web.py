@@ -1,4 +1,4 @@
-from flask import Flask, session, request, Blueprint, _app_ctx_stack
+from flask import Flask, session, request, Blueprint, _app_ctx_stack, redirect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -39,7 +39,6 @@ def close_db_connection(exception):
 static_js = Blueprint('static_js', __name__, static_folder='js')
 static_css = Blueprint('static_css', __name__, static_folder='css')
 static_bootstrap = Blueprint('static_bootstrap', __name__, static_folder='bootstrap')
-
 
 app.register_blueprint(static_js)
 app.register_blueprint(static_css)

@@ -1,0 +1,44 @@
+{% extends "_layout.html" %}
+{% block title %}My code templates{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="span12 btn-group">
+            <a href="/template/" class="btn btn-success">Create</a>
+            <button id="btnModi" class="btn btn-info" disabled="disabled">Modi</button>
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="span12">
+            <table class="table">
+                <thead>
+                <tr>
+                    <td class="text-center">标题</td>
+                    <td class="text-center">创建时间</td>
+                    <td style="width: 90px" class="text-center">操作</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for temp in templates %}
+                    <tr>
+                        <td>{{ temp.title }}</td>
+                        <td>{{ temp.create_date }}</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a href="/template/{{ temp.id }}/" class="btn btn-small">修改</a>
+                                <a href="/template/share/" class="btn btn-small">共有</a>
+                            </div>
+
+                        </td>
+                    </tr>
+                    </tbody>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block foot_js %}
+    <script type="text/javascript">
+    </script>
+{% endblock %}

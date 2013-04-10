@@ -1,38 +1,15 @@
-#coding: utf-8
-import datetime
-from functools import wraps
-import urllib
+# -*- coding: utf-8 -*-
+from datetime import datetime
 from flask import render_template, request, session, make_response, redirect
 from models.project import table, col
-from models.orm import User, Project, Template
+from models.orm import User, Project
 from zp_tools import rdm_code, hash_pwd, json_res, is_name, str2bool
 from zp_web import app, get_db
-from zp_tools import s_user, s_project
+from zp_tools import s_user, s_project, login_required, login_required_ajax
 from zp_types import types_map
 
 __author__ = 'cloudbeer'
 
-
-def login_required(func):
-    @wraps(func)
-    def warpper_mormal(*args, **kwargs):
-        user = s_user()
-        if not user:
-            return redirect('/account/login/?' + urllib.urlencode({'back': request.path}))
-        else:
-            return func(*args, **kwargs)
-    return warpper_mormal
-
-
-def login_required_ajax(func):
-    @wraps(func)
-    def warpper_ajax(*args, **kwargs):
-        user = s_user()
-        if not user:
-            return json_res(False, message='You must login first.').str()
-        else:
-            return func(*args, **kwargs)
-    return warpper_ajax
 
 @app.route("/")
 def pg_index():
@@ -44,35 +21,32 @@ def pg_index():
 def pg_projects():
     user = s_user()
     db = get_db()
-    projects = db.query(Project).filter(User.id == user.id)
+    projects = db.query(Project).filter(User.id == user.id).order_by(Project.id.desc())
     return render_template("projects.html", projects=projects, user=s_user())
 
 
 @app.route("/project/")
 @login_required
 def pg_project():
-    user = s_user()
-    if user:
-        project = s_project()
-        sql_types = None
-        db = project.db
-        if db in types_map:
-            sql_types = types_map[db]['sql']
-        return render_template("project.html", project=project, user=s_user(), types_map=types_map, sql_types=sql_types)
-    else:
-        return redirect('/account/login/?' + urllib.urlencode({'back': request.path}))
+    project = s_project()
+    sql_types = None
+    db = project.db
+    if db in types_map:
+        sql_types = types_map[db]['sql']
+    return render_template("project.html", project=project, user=s_user(), types_map=types_map, sql_types=sql_types)
 
 
 @app.route("/project/<int:id>/")
 @login_required
 def pg_my_project(id):
     db = get_db()
-    project = db.query(Project).filter(Project.id == id)
+    project = db.query(Project).filter(Project.id == id).first()
     if project is None:
         return "Error Project."
-    import yaml
+    import cPickle
     content = project.content
-    project = yaml.load(content)
+    project = cPickle.loads(str(content))
+    project.dbid = id
     session['project'] = project
     db = project.db
     sql_types = None
@@ -95,17 +69,20 @@ def pg_project_save():
     return json_res(True).str()
 
 
-@app.route("/project/save2db/", methods=['post', 'get'])
+@app.route("/project/save2db/", methods=['post'])
 @login_required_ajax
 def pg_project_save_to_db():
     project = s_project()
+    import cPickle
+    content = cPickle.dumps(project)
     user = s_user()
-    import yaml
-    content = yaml.dump(project)
-    # return content
-    m_project = Project(title=project.title, content=content, user_id=user.id)
+    m_project = Project(title=project.title, content=content, user_id=user.id, create_date=datetime.now())
     db = get_db()
-    db.add(m_project)
+    if project.dbid is not None and project.dbid > 0:
+        m_project.id = project.dbid
+        db.merge(m_project)
+    else:
+        db.add(m_project)
     db.commit()
     project.dbid = m_project.id
     session['project'] = project

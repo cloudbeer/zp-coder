@@ -1,8 +1,10 @@
+from functools import wraps
 import random
 import string
 import hashlib
 import json
-from flask import session, request
+import urllib
+from flask import session, request, redirect
 from models.orm import User
 from models.project import project
 from zp_web import get_db
@@ -86,3 +88,26 @@ def s_project():
         m_project = project()
         session['project'] = m_project
         return m_project
+
+def login_required_ajax(func):
+    @wraps(func)
+    def warpper_ajax(*args, **kwargs):
+        user = s_user()
+        if not user:
+            return json_res(False, message='You must login first.').str()
+        else:
+            return func(*args, **kwargs)
+
+    return warpper_ajax
+
+
+def login_required(func):
+    @wraps(func)
+    def warpper_mormal(*args, **kwargs):
+        user = s_user()
+        if not user:
+            return redirect('/account/login/?' + urllib.urlencode({'back': request.path}))
+        else:
+            return func(*args, **kwargs)
+
+    return warpper_mormal

@@ -45,7 +45,7 @@ class Template(Base):
     rank = Column(Integer, default=0)
     create_date = Column(DateTime)
 
-    def __init__(self, id, title, user_id, content, status, type, popular, rank, create_date):
+    def __init__(self, id=None, title=None, user_id=None, content=None, status=None, type=None, popular=None, rank=None, create_date=None):
         self.id = id
         self.title = title
         self.user_id = user_id

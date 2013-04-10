@@ -1,9 +1,6 @@
-#coding: utf-8
-from zp_web import app, get_db
-import front_pages
-
-
-
+# -*- coding: utf-8 -*-
+from zp_web import app
+import fp_projects, fp_templates
 
 
 if __name__ == '__main__':
