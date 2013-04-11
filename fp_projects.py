@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from flask import render_template, request, session, make_response, redirect
+from flask import render_template, request, session, make_response, redirect, Response
+from jinja2 import Template as jTemplate
 from models.project import table, col
-from models.orm import User, Project
-from zp_tools import rdm_code, hash_pwd, json_res, is_name, str2bool
+from models.orm import User, Project, Template
+from zp_tools import rdm_code, hash_pwd, json_res, is_name, str2bool, str2val
 from zp_web import app, get_db
 from zp_tools import s_user, s_project, login_required, login_required_ajax
 from zp_types import types_map
@@ -44,6 +45,7 @@ def pg_my_project(id):
     if project is None:
         return "Error Project."
     import cPickle
+
     content = project.content
     project = cPickle.loads(str(content))
     project.dbid = id
@@ -74,6 +76,7 @@ def pg_project_save():
 def pg_project_save_to_db():
     project = s_project()
     import cPickle
+
     content = cPickle.dumps(project)
     user = s_user()
     m_project = Project(title=project.title, content=content, user_id=user.id, create_date=datetime.now())
@@ -290,6 +293,24 @@ def pg_sql_types():
         xdb = types_map[db]["sql"]
         res.sql_types = xdb
     return res.str()
+
+
+@app.route("/produce/", methods=["get"])
+def pg_produce():
+    project_id = str2val(request.args.get('pid', ''), 0)
+    template_id = str2val(request.args.get('tid', ''), 0)
+    if project_id <= 0 or template_id <= 0:
+        return "Must prefer template_id and project_id."
+    db = get_db()
+    m_project = db.query(Project).filter(Project.id == project_id).first()
+    m_tempate = db.query(Template).filter(Template.id == template_id).first()
+    if m_project is None or m_tempate is None:
+        return "Tempalte or project must be right."
+    import cPickle
+    project = cPickle.loads(str(m_project.content))
+    template = jTemplate(m_tempate.content)
+    code = template.render(project=project)
+    return Response(code, mimetype='text/plain')
 
 
 @app.route("/t/")

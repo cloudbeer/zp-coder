@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from functools import wraps
 import random
 import string
@@ -39,6 +40,30 @@ def is_name(s):
 
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
+
+
+def str2val(string, default=None):
+    """
+    将字符串变成值
+    :param string:
+    :param default:
+    :return:
+    """
+    for atom in (True, False, None):
+        if str(atom) == string:
+            return atom
+    else:
+        try:
+            return int(string)
+        except ValueError:
+            if default is not None:
+                return default
+            try:
+                return float(string)
+            except ValueError:
+                if default is not None:
+                    return default
+                return string
 
 
 class json_res(dict):
@@ -88,6 +113,7 @@ def s_project():
         m_project = project()
         session['project'] = m_project
         return m_project
+
 
 def login_required_ajax(func):
     @wraps(func)

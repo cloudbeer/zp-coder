@@ -7,5 +7,4 @@ Required:
 * PostgreSQL
 * flask
 * sqlalchemy
-* pyyaml
 * psycopg2

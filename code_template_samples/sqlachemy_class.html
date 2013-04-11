@@ -1,0 +1,19 @@
+{% for table in project.tables %}
+class {{ table.name }}:
+    __tablename__ = '{{ table.name }}'
+
+    {% for col in table.cols -%}
+    {{ col.name }} = Column()
+    {% endfor %}
+
+    def __init__(self,
+        {%- for col in table.cols -%}
+            {{ col.name }}=None,
+        {%- endfor %}):
+        {% for col in table.cols -%}
+        self.{{ col.name }} = {{ col.name }}
+        {% endfor %}
+
+    def __repr__(self):
+    return "<{{ table.name }}({{ '%s, '*3 }})>" % ({% for col in table.cols %}self.{{ col.name }}, {% endfor %})
+{% endfor %}
