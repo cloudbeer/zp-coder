@@ -1,5 +1,8 @@
+from sqlalchemy import Column, Integer, String, DateTime, Sequence
+from sqlalchemy.ext.declarative import declarative_base
+
 {% for table in project.tables %}
-class {{ table.name }}:
+class {{ table.name }}(Base):
     __tablename__ = '{{ table.name }}'
 
     {% for col in table.cols -%}
@@ -15,6 +18,7 @@ class {{ table.name }}:
         {% endfor %}
 
     def __repr__(self):
-    return "<{{ table.name }}({{ '%s, '*3 }})>" % ({% for col in table.cols %}self.{{ col.name }}, {% endfor %})
+        return "<{{ table.name }}({% for col in table.cols %}%s, {% endfor %})>" % ({% for col in table.cols %}self.{{ col.name }}, {% endfor %})
+
 {% endfor %}
 
