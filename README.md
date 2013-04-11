@@ -1,7 +1,7 @@
 zp-coder
 ========
 
-An online code tools
+An online code tools. Code template is Jinjia2.
 
 Required:
 * PostgreSQL
